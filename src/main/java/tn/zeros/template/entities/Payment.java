@@ -1,0 +1,36 @@
+package tn.zeros.template.entities;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import tn.zeros.template.entities.enums.PaymentStatus;
+import tn.zeros.template.entities.enums.UStatus;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.*;
+
+@Entity
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@FieldDefaults(level = AccessLevel.PRIVATE)
+
+public class Payment implements Serializable{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
+
+    String reference;
+    BigDecimal amount;
+
+    @Enumerated(EnumType.STRING)
+    PaymentStatus status;
+
+}

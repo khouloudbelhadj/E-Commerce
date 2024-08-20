@@ -30,7 +30,6 @@ import java.util.*;
 public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-
     private final ITokenService tokenService;
 
     @Lazy
@@ -46,6 +45,8 @@ public class UserService implements IUserService {
         }
         //////////////////////////////////////////////////////////////////////
         String encodedPassword = encoder.encode(user.getPassword());
+        log.info("Password Here");
+        log.info(user.getPassword());
         Role userRole = roleRepository.findById(2L).get();
         Set<Role> authorities = new HashSet<>();
         authorities.add(userRole);
@@ -63,7 +64,7 @@ public class UserService implements IUserService {
                 .orElseThrow(() -> new InvalidCredentialsException("Wrong email or password"));
 
         // Check if the password matches
-        if (!encoder.matches(password, user.getPassword()) || !user.getStatus().equals(UStatus.Active)) {
+        if (!encoder.matches(password, user.getPassword())) {
             throw new InvalidCredentialsException("Wrong email or password");
         }
 
@@ -147,12 +148,15 @@ public class UserService implements IUserService {
             return null;
         }
         //////////////////////////////////////////////////////////////////////
-        c.setPassword(encoder.encode(c.getPassword()));
-        Role userRole = roleRepository.findById(c.getRole().stream().findFirst().get().getId()).get();
+
+        String encodedPassword= encoder.encode(c.getPassword());
+        c.setPassword(encodedPassword);
+        Role userRole = roleRepository.findById(2L).get();
         Set<Role> authorities = new HashSet<>();
         authorities.add(userRole);
         c.setRole(authorities);
         return userRepository.save(c);
+
     }
 
     @Override
@@ -165,6 +169,8 @@ public class UserService implements IUserService {
     public User modifyUser(User user) {
         Optional<User> existingUser = userRepository.findById(user.getId());
         if (existingUser.isPresent()) {
+            String encodedPassword= encoder.encode(user.getPassword());
+            user.setPassword(encodedPassword);
             return userRepository.save(user);
         } else {
             throw new EntityNotFoundException("User not found with id: " + user.getId());
@@ -174,5 +180,7 @@ public class UserService implements IUserService {
     @Override
     public User loadUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("User not found with email: " + email));
+
     }
+
 }

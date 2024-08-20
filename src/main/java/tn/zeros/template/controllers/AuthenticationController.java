@@ -9,10 +9,13 @@ import tn.zeros.template.controllers.DTO.LoginDTO;
 import tn.zeros.template.controllers.DTO.LoginResponseDTO;
 import tn.zeros.template.controllers.DTO.LogoutResponseDTO;
 import tn.zeros.template.controllers.DTO.RegistrationDTO;
+import tn.zeros.template.entities.Adress;
 import tn.zeros.template.entities.User;
 import tn.zeros.template.exceptions.InvalidCredentialsException;
 import tn.zeros.template.services.IServices.ITokenService;
 import tn.zeros.template.services.IServices.IUserService;
+
+import java.time.LocalDate;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,10 +25,22 @@ import tn.zeros.template.services.IServices.IUserService;
 public class AuthenticationController {
     private final IUserService userService;
     private final ITokenService tokenService;
+
     @PostMapping("/register")
     public ResponseEntity<Boolean> registerUser(@RequestBody RegistrationDTO body){
         log.info(body.toString());
-        User user = new User(null, body.getEmail(), body.getPassword(), null, null);
+
+        Adress adress = new Adress() ;
+        if (body.getAdress() != null) {
+            Adress a = new Adress(null, body.getAdress().getStreet(), body.getAdress().getHouseNumber(), body.getAdress().getZipCode());
+            adress =a ;
+        }
+        //User user = new User(null, body.getCode(), body.getEmail(), body.getPassword(), body.getFirstName(),
+         //       body.getLastName(), body.getPhoneNumber(), body.getMf(), body.getVille(), null, null, adress);
+
+        User user = User.builder().email(body.getEmail()).password(body.getPassword()).code(body.getCode()).phoneNumber(body.getPhoneNumber()).mf(body.getMf()).lastName(body.getLastName()).firstName(body.getFirstName()).ville(body.getVille()).adress(adress).build();
+
+                log.info(user.getPassword());
         User registeredUser = userService.registerUser(user);
         if (registeredUser != null) {
             return ResponseEntity.ok(true);

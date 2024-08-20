@@ -10,7 +10,6 @@ import tn.zeros.template.entities.enums.UStatus;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -26,6 +25,12 @@ public class User implements Serializable, UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+    String code ;
+    String firstName;
+    String lastName;
+    String phoneNumber;
+    String mf ;
+    String ville ;
     String email;
     String password;
 
@@ -34,6 +39,11 @@ public class User implements Serializable, UserDetails {
     @Enumerated(EnumType.STRING)
     UStatus status;
 
+    @ToString.Exclude
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "adress_id")
+    private Adress adress;
+
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities()  {
@@ -41,7 +51,6 @@ public class User implements Serializable, UserDetails {
     }
 
     @Override
-    @JsonIgnore
     public String getPassword() {
         return this.password;
     }
